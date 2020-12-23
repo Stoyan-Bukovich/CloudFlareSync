@@ -1,0 +1,23 @@
+﻿{
+	"SyncIntervalInMilliseconds": 5000,
+	"Domains": [
+		{
+			"APIKey": "r7fd9a2d1a7a04606e3f66c9f77d26d3eb455",
+			"Email": "developer@gmail.com",
+			"Domain_Name": "mydomain.com",
+			"DNS_Record": "dyn.mydomain.com",
+			"Type": "A",
+			"TTL": "120",
+			"Proxied": "false"
+		},
+		{
+			"APIKey": "r7fd9a2d1a7a04606e3f66c9f77d26d3eb455",
+			"Email": "developer@gmail.com",
+			"Domain_Name": "mydomain.com",
+			"DNS_Record": "mydomain.com",
+			"Type": "A",
+			"TTL": "120",
+			"Proxied": "false"
+		}
+	]
+}
