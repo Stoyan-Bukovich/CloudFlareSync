@@ -1,6 +1,6 @@
 # CloudFlare Sync in .NET 5 on GNU/Linux
 
-![CloudFlare Sync in .NET 5!](/img/cloudflare.png "CloudFlare")
+![alt text](https://github.com/Stoyan-Bukovich/CloudFlareSync/blob/[branch]/cloudflare.png?raw=true)
 
 
 This is a code base for CloudFlare dynamic DNS records update. It permits you to synchronize finite number of DNS records over CloudFlare's API.
