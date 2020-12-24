@@ -58,24 +58,24 @@ This file contains synchronization events notifications. This file will be autom
 sudo vi /etc/systemd/system/CloudFlare.service
 
 
-[Unit]
-Description=CloudFlare Domain Sync
+> [Unit]
+> Description=CloudFlare Domain Sync
 
-[Service]
-WorkingDirectory=/root/cloudflaresync
-ExecStart=/root/cloudflaresync/cloudflare
-SyslogIdentifier=root
-User=root
+> [Service]
+> WorkingDirectory=/root/cloudflaresync
+> ExecStart=/root/cloudflaresync/cloudflare
+> SyslogIdentifier=root
+> User=root
 
-Restart=always
-RestartSec=5
+> Restart=always
+> RestartSec=5
 
-KillSignal=SIGINT
-Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+> KillSignal=SIGINT
+> Environment=ASPNETCORE_ENVIRONMENT=Production
+> Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
-[Install]
-WantedBy=multi-user.target
+> [Install]
+> WantedBy=multi-user.target
 
 
 **Enable service on machine start**
