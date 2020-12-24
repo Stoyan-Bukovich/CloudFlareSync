@@ -1,6 +1,8 @@
-# CloudFlareSync in .NET 5
+# CloudFlare Sync in .NET 5 on GNU/Linux
 
-This is a code base for CloudFlare dynamic DNS records update. It permits you to synchronize finite number of DNS records over CloudFlare API. Tested only with A records, theoretically should work with any other DNS record types.
+This is a code base for CloudFlare dynamic DNS records update. It permits you to synchronize finite number of DNS records over CloudFlare's API.
+The code is tested only with A records, theoretically should work with any other DNS record types.
+
 
 
 **********************
