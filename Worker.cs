@@ -14,16 +14,19 @@ namespace cloudflare
 {
     public class Worker : BackgroundService
     {        
+        public static readonly string configPath = Path.Combine(Directory.GetCurrentDirectory(), "config.dat");
+        public static readonly string logPath = Path.Combine(Directory.GetCurrentDirectory(), "log.dat");
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-			try
+            try
             {
-                string config = await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "config.dat"));
+                string config = await File.ReadAllTextAsync(configPath);
                 dynamic data = JObject.Parse(config);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await SyncAllAsync();
+                    _ = Task.Run(() => SyncAllAsync());
                     await Task.Delay((int)data.SyncIntervalInMilliseconds, stoppingToken); // Time to wait between syncs. All domains are synced at once when this time expires.
                 }
             }
@@ -32,13 +35,11 @@ namespace cloudflare
                 await LogWriteAsync("General exeception ExecuteAsync: " + ex.Message + " " + DateTime.UtcNow);
             }
         }
-
+		
         #region Methods      
         protected async Task SyncAllAsync()
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "config.dat");
-
-            if (File.Exists(path))
+            if (File.Exists(configPath))
             {
                 string wanip = await InfoWANIPAsync();
 
@@ -46,11 +47,11 @@ namespace cloudflare
                 {                                    
                     if(wanip != "N/A")
                     { 
-                        string configuration = await File.ReadAllTextAsync(path);
+                        string configuration = await File.ReadAllTextAsync(configPath);
 
                         dynamic data = JObject.Parse(configuration);
                         dynamic domains = data.Domains;
-
+                        
                         foreach (dynamic domain in domains)
                         {
                             string apikey = Convert.ToString(domain.APIKey);
@@ -162,27 +163,26 @@ namespace cloudflare
             }
             else
             {
-                await LogWriteAsync("Configuration file not found in this directory: " + path + " " + DateTime.UtcNow);
+                await LogWriteAsync("Configuration file not found in this directory: " + configPath + " " + DateTime.UtcNow);
             }
         }
 
         protected async Task LogWriteAsync(string message)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "log.dat");
-
-            if (File.Exists(path))
-            {    try
-                 {
-                    FileInfo fi = new FileInfo(path);
+            if (File.Exists(logPath))
+            {
+                try
+                {
+                    FileInfo fi = new FileInfo(logPath);
 
                     if (fi.Length >= 1024 * 1024 * 10) // 10 MB max file size.
-                    {              
-                        await File.WriteAllTextAsync(path, message + Environment.NewLine);
+                    {
+                        await File.WriteAllTextAsync(logPath, message + Environment.NewLine);
                     }
                     else
                     {
-                        await File.AppendAllTextAsync(path, message + Environment.NewLine);
-                    }           
+                        await File.AppendAllTextAsync(logPath, message + Environment.NewLine);
+                    }
                 }
                 catch { }
             }
@@ -190,7 +190,7 @@ namespace cloudflare
             {
                 try
                 {
-                    await File.WriteAllTextAsync(path, message + Environment.NewLine);
+                    await File.WriteAllTextAsync(logPath, message + Environment.NewLine);
                 }
                 catch { }
             }
@@ -198,7 +198,7 @@ namespace cloudflare
 
         protected async Task<string> InfoWANIPAsync()
         {
-             string ip = "N/A";
+            string ip = "N/A";
             List<string> ips = new List<string>();
             
             #region Get IP
