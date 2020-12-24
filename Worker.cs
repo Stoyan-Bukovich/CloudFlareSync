@@ -42,17 +42,17 @@ namespace cloudflare
             if (File.Exists(configPath))
             {
                 string wanip = await InfoWANIPAsync();
+                                  
+                if(wanip != "N/A")
+                { 
+                    string configuration = await File.ReadAllTextAsync(configPath);
 
-                try
-                {                                    
-                    if(wanip != "N/A")
-                    { 
-                        string configuration = await File.ReadAllTextAsync(configPath);
-
-                        dynamic data = JObject.Parse(configuration);
-                        dynamic domains = data.Domains;
+                    dynamic data = JObject.Parse(configuration);
+                    dynamic domains = data.Domains;
                         
-                        foreach (dynamic domain in domains)
+                    foreach (dynamic domain in domains)
+                    {
+                        try
                         {
                             string apikey = Convert.ToString(domain.APIKey);
                             string email = Convert.ToString(domain.Email);
@@ -148,17 +148,18 @@ namespace cloudflare
                             reader.Close();
                             resp.Close();
 
-                            await LogWriteAsync("Synced " + dnsRecord + " to WAN IP " + wanip + " on " + DateTime.UtcNow);                      
+                            await LogWriteAsync("Synced " + dnsRecord + " to WAN IP " + wanip + " on " + DateTime.UtcNow);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            await LogWriteAsync("General exeception SyncAllAsync: " + ex.Message + " " + DateTime.UtcNow);
                         }
                     }
-                    else
-                    {
-                        await LogWriteAsync("Could not find the WAN IP address. No syncing will proceed. Please, check Internet connectivity. " + DateTime.UtcNow);
-                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    await LogWriteAsync("General exeception SyncAllAsync: " + ex.Message + " " + DateTime.UtcNow);
+                    await LogWriteAsync("Could not find the WAN IP address. No syncing will proceed. Please, check Internet connectivity. " + DateTime.UtcNow);
                 }
             }
             else
