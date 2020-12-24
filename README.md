@@ -48,10 +48,7 @@ This file contains synchronization events notifications. This file will be autom
 
 **How to**
 
-	* To get your APIKey please, logon to your CloudFlare account, go to "My Profile" > "API Tokens" > "API Keys" click on "View" button, type your password and resolve the Captcha. Copy the API Key
-		value and use it into APIKey domain settings.
-
-
+To get your APIKey please, logon to your CloudFlare account, go to "My Profile" > "API Tokens" > "API Keys" click on "View" button, type your password and resolve the Captcha. Copy the API Key value and use it into APIKey domain settings.
 
 **Run as GNU/Linux service**
 
@@ -60,20 +57,20 @@ sudo vi /etc/systemd/system/CloudFlare.service
 
 > [Unit]
 > Description=CloudFlare Domain Sync
-
+> 
 > [Service]
 > WorkingDirectory=/root/cloudflaresync
 > ExecStart=/root/cloudflaresync/cloudflare
 > SyslogIdentifier=root
 > User=root
-
+> 
 > Restart=always
 > RestartSec=5
-
+> 
 > KillSignal=SIGINT
 > Environment=ASPNETCORE_ENVIRONMENT=Production
 > Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
-
+> 
 > [Install]
 > WantedBy=multi-user.target
 
