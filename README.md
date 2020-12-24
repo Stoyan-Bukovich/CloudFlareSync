@@ -71,6 +71,13 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 [Install]
 WantedBy=multi-user.target
 
+
+* Enable service on machine start
 systemctl enable CloudFlare
+
+* Start the service
 systemctl start CloudFlare
+
+* Check that everything is OK.
 systemctl status CloudFlare
+
