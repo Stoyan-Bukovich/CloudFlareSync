@@ -68,19 +68,27 @@ sudo vi /etc/systemd/system/CloudFlare.service
 > Description=CloudFlare Domain Sync
 > 
 > [Service]
+>
 > WorkingDirectory=/root/cloudflaresync
+>
 > ExecStart=/root/cloudflaresync/cloudflare
+>
 > SyslogIdentifier=root
+>
 > User=root
 > 
 > Restart=always
+>
 > RestartSec=5
 > 
 > KillSignal=SIGINT
+>
 > Environment=ASPNETCORE_ENVIRONMENT=Production
+>
 > Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 > 
 > [Install]
+>
 > WantedBy=multi-user.target
 
 <br />
