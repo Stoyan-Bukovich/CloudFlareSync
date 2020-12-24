@@ -16,7 +16,7 @@ namespace cloudflare
     {        
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            try
+			try
             {
                 string config = await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "config.dat"));
                 dynamic data = JObject.Parse(config);
@@ -29,7 +29,7 @@ namespace cloudflare
             }
             catch (Exception ex)
             {
-                await LogWriteAsync(ex.Message);
+                await LogWriteAsync("General exeception ExecuteAsync: " + ex.Message + " " + DateTime.UtcNow);
             }
         }
 
@@ -40,13 +40,13 @@ namespace cloudflare
 
             if (File.Exists(path))
             {
-                try
-                {
-                    string wanip = await InfoWANIPAsync();                    
+                string wanip = await InfoWANIPAsync();
 
+                try
+                {                                    
                     if(wanip != "N/A")
                     { 
-                        string configuration = File.ReadAllText(path);
+                        string configuration = await File.ReadAllTextAsync(path);
 
                         dynamic data = JObject.Parse(configuration);
                         dynamic domains = data.Domains;
@@ -66,16 +66,18 @@ namespace cloudflare
                             ServicePointManager.Expect100Continue = false;
 
                             // Get zone-id for the domain name, which is used in the update statement below.
-                            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://api.cloudflare.com/client/v4/zones?&name=" + domainName);                                
+                            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://api.cloudflare.com/client/v4/zones?&name=" + domainName);
                             req.Proxy = null;
+                            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+                            req.Timeout = 5000; // time spent trying to establish a connection (not including lookup time) before give up.
                             req.Accept = "*/*";
                             req.Method = "GET";
                             req.Headers.Add("X-Auth-Email:" + email);
                             req.Headers.Add("X-Auth-Key:" + apikey);
                             req.ContentType = "application/json";
 
-                            HttpWebResponse response = (HttpWebResponse)req.GetResponse();
-                            Stream dataStream = response.GetResponseStream();
+                            HttpWebResponse resp = (HttpWebResponse) await req.GetResponseAsync();
+                            Stream dataStream = resp.GetResponseStream();
                             StreamReader reader = new StreamReader(dataStream);
 
                             string zones = String.Empty;
@@ -83,7 +85,7 @@ namespace cloudflare
                             dynamic results = zones_data.result;
 
                             reader.Close();
-                            response.Close();
+                            resp.Close();
                                 
                             foreach (dynamic result in results)
                             {
@@ -92,14 +94,17 @@ namespace cloudflare
 
                             // Get dns_record id for the DNS record, which is used in the update statement below.
                             req = (HttpWebRequest)WebRequest.Create("https://api.cloudflare.com/client/v4/zones/" + zones + "/dns_records?type=" + type + "&name=" + dnsRecord);
+                            req.Proxy = null;
+                            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+                            req.Timeout = 5000; // time spent trying to establish a connection (not including lookup time) before give up.
                             req.Accept = "*/*";
                             req.Method = "GET";
                             req.Headers.Add("X-Auth-Email:" + email);
                             req.Headers.Add("X-Auth-Key:" + apikey);
                             req.ContentType = "application/json";
 
-                            response = (HttpWebResponse)req.GetResponse();
-                            dataStream = response.GetResponseStream();
+                            resp = (HttpWebResponse) await req.GetResponseAsync();
+                            dataStream = resp.GetResponseStream();
                             reader = new StreamReader(dataStream);
 
                             string dns_records = String.Empty;
@@ -107,7 +112,7 @@ namespace cloudflare
                             dynamic zone_results = zone_data.result;
 
                             reader.Close();
-                            response.Close();
+                            resp.Close();
 
                             foreach (dynamic result in zone_results)
                             {
@@ -115,30 +120,32 @@ namespace cloudflare
                             }
 
                             // Send zone update.
-                            req = (HttpWebRequest)WebRequest.Create("https://api.cloudflare.com/client/v4/zones/" + zones + "/dns_records/" + dns_records);                                
+                            req = (HttpWebRequest)WebRequest.Create("https://api.cloudflare.com/client/v4/zones/" + zones + "/dns_records/" + dns_records);
+                            req.Proxy = null;
+                            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+                            req.Timeout = 5000; // time spent trying to establish a connection (not including lookup time) before give up.
                             req.Accept = "*/*";
                             req.Method = "PUT";
+                            req.Headers.Clear();
                             req.Headers.Add("X-Auth-Email:" + email);
                             req.Headers.Add("X-Auth-Key:" + apikey);
                             req.ContentType = "application/json";
 
                             string jsonData = "{\"type\":\"" + type + "\",\"name\":\"" + dnsRecord + "\",\"content\":\"" + wanip + "\",\"ttl\":" + ttl + ",\"proxied\":" + proxied + "}";
 
-                            using (var sw = new StreamWriter(await req.GetRequestStreamAsync()))
-                            {
-                                sw.Write(jsonData);
-                                sw.Flush();
-                                sw.Close();
-                            }
-
-                            response = (HttpWebResponse)req.GetResponse();
-                            dataStream = response.GetResponseStream();
+                            StreamWriter sw = new StreamWriter(await req.GetRequestStreamAsync());
+                            sw.Write(jsonData);
+                            sw.Flush();
+                            sw.Close();
+                           
+                            resp = (HttpWebResponse)await req.GetResponseAsync();
+                            dataStream = resp.GetResponseStream();
                             reader = new StreamReader(dataStream);
 
                             await reader.ReadToEndAsync();
 
                             reader.Close();
-                            response.Close();
+                            resp.Close();
 
                             await LogWriteAsync("Synced " + dnsRecord + " to WAN IP " + wanip + " on " + DateTime.UtcNow);                      
                         }
@@ -150,12 +157,12 @@ namespace cloudflare
                 }
                 catch (Exception ex)
                 {
-                    await LogWriteAsync(ex.Message);
+                    await LogWriteAsync("General exeception SyncAllAsync: " + ex.Message + " " + DateTime.UtcNow);
                 }
             }
             else
             {
-                await LogWriteAsync("Configuration file not found in this directory: " + path);
+                await LogWriteAsync("Configuration file not found in this directory: " + path + " " + DateTime.UtcNow);
             }
         }
 
@@ -164,31 +171,26 @@ namespace cloudflare
             string path = Path.Combine(Directory.GetCurrentDirectory(), "log.dat");
 
             if (File.Exists(path))
-            {
-                FileInfo fi = new FileInfo(path);
+            {    try
+                 {
+                    FileInfo fi = new FileInfo(path);
 
-                if (fi.Length >= 1024 * 1024 * 10) // 10 MB max file size.
-                {
-                    try
-                    {
-                        File.Delete(path);
-                        using (FileStream fs = File.Create(path)) { }
-                        await File.AppendAllTextAsync(path, message + Environment.NewLine);
+                    if (fi.Length >= 1024 * 1024 * 10) // 10 MB max file size.
+                    {              
+                        await File.WriteAllTextAsync(path, message + Environment.NewLine);
                     }
-                    catch { }
+                    else
+                    {
+                        await File.AppendAllTextAsync(path, message + Environment.NewLine);
+                    }           
                 }
-                else
-                {
-                    await File.AppendAllTextAsync(path, message + Environment.NewLine);
-                }
+                catch { }
             }
             else
             {
                 try
                 {
-                    using (FileStream fs = File.Create(path)) { }
-
-                    await File.AppendAllTextAsync(path, message + Environment.NewLine);
+                    await File.WriteAllTextAsync(path, message + Environment.NewLine);
                 }
                 catch { }
             }
@@ -196,91 +198,74 @@ namespace cloudflare
 
         protected async Task<string> InfoWANIPAsync()
         {
-            string ip = "N/A";
+             string ip = "N/A";
             List<string> ips = new List<string>();
             
             #region Get IP
+            WebClient wc = new WebClient();
+            wc.Proxy = null; // remove any local proxies, direct connection.
+
+            string ipAddress = String.Empty;
+
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("http://ipinfo.io/ip");
-
+                ipAddress = await wc.DownloadStringTaskAsync("http://ipinfo.io/ip");
                 ips.Add(ipAddress.Trim());
             }
             catch { }            
             
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                ips.Add(wc.DownloadString("https://api4.my-ip.io/ip").Trim());
+                ipAddress = await wc.DownloadStringTaskAsync("https://api4.my-ip.io/ip");
+                ips.Add(ipAddress.Trim());
             }
             catch { }           
             
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("https://ip4.seeip.org");
-
+                ipAddress = await wc.DownloadStringTaskAsync("https://ip4.seeip.org");
                 ips.Add(ipAddress.Trim());
             }
             catch { }
 
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("http://ipv4bot.whatismyipaddress.com");
-
+                ipAddress = await wc.DownloadStringTaskAsync("http://ipv4bot.whatismyipaddress.com");
                 ips.Add(ipAddress.Trim());
             }
             catch { }
      
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("https://api.ipify.org");
-
+                ipAddress = await wc.DownloadStringTaskAsync("https://api.ipify.org");
                 ips.Add(ipAddress.Trim());
             }
             catch { }      
             
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("https://checkip.amazonaws.com");
-
+                ipAddress = await wc.DownloadStringTaskAsync("https://checkip.amazonaws.com");
                 ips.Add(ipAddress.Trim());
             }
             catch { }
 
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
-                string ipAddress = await wc.DownloadStringTaskAsync("https://v4.ident.me");
-
+                ipAddress = await wc.DownloadStringTaskAsync("https://v4.ident.me");
                 ips.Add(ipAddress.Trim());
             }
             catch { }
        
             try
             {
-                WebClient wc = new WebClient();
-                wc.Proxy = new WebProxy(); // remove any local proxies, direct connection.
+                ipAddress = await wc.DownloadStringTaskAsync("http://checkip.dyndns.org");
+                ipAddress = ipAddress.Replace("<html><head><title>Current IP Check</title></head><body>Current IP Address:", String.Empty);
+                ipAddress = ipAddress.Replace("</body></html>", String.Empty);
 
-                string dyndns = await wc.DownloadStringTaskAsync("http://checkip.dyndns.org");
-                dyndns = dyndns.Replace("<html><head><title>Current IP Check</title></head><body>Current IP Address:", String.Empty);
-                dyndns = dyndns.Replace("</body></html>", String.Empty);
-
-                ips.Add(dyndns.Trim());
+                ips.Add(ipAddress.Trim());
             }
             catch { }
-            #endregion          
+            #endregion
 
             try
             {
