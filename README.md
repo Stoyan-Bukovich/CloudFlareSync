@@ -77,16 +77,19 @@ sudo vi /etc/systemd/system/CloudFlare.service
 > WantedBy=multi-user.target
 
 <br />
+
 **Enable service on machine start**
 ****
 systemctl enable CloudFlare
 
 <br />
+
 **Start the service**
 ****
 systemctl start CloudFlare
 
 <br />
+
 **Check that everything is OK.**
 ****
 systemctl status CloudFlare
