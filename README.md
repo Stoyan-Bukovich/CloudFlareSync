@@ -7,11 +7,15 @@ The code is tested only with A records, theoretically should work with any other
 Read this before reusing the code:
 
 
-* Rate limiting
-	* The Cloudflare API sets a maximum of 1,200 requests in a five minute period. Please, consider this limitation or you might get banned.
+**Rate limiting**
+
+The Cloudflare API sets a maximum of 1,200 requests in a five minute period. Please, consider this limitation or you might get banned.
 
 
-* Config.dat file (This file contains the main settings)	
+**Config.dat file**
+
+This file contains the main settings
+
 	* SyncIntervalInMilliseconds - Would set how frequently all domain names would be synced with CloudFlare. Please, note that all domain names are synced simultaneously.
 							     If this value is changed the change would not be picked-up automatically. Please, restart the service or the executable. Other observation is
 								 the minimum sync time which needs to consider time for WAN IP address check with the following formula total sync time = sync interval + approx. 10 seconds
@@ -31,7 +35,9 @@ Read this before reusing the code:
 		*  TTL - Time to live value in seconds. Please, consider that the free CloudFlare accounts are limited to minimum allowed ttl of 120 seconds / 2 min. Do not set values less than that.
 		*  Proxied - Accepts true or false values and turns the CloudFlare proxy on or off. Please, do not apply to MX records.
 
-* Log.dat (This file contains synchronization events notifications. This file will be automatically maintained to keep its size under 10 MB. After reaching 10 MB size, would be deleted and recreated.)
+**Log.dat file**
+
+This file contains synchronization events notifications. This file will be automatically maintained to keep its size under 10 MB. After reaching 10 MB size, would be deleted and recreated.
 
 	* Event types:
 		* Success message per domain in UTC time: "Synced mydomain.com to WAN IP 123.123.123.0 on 12.12.2020 01:05:33 PM"
@@ -40,7 +46,7 @@ Read this before reusing the code:
 		* General exception messages from try catch blocks.
 
 
-* How to
+**How to**
 
 	* To get your APIKey please, logon to your CloudFlare account, go to "My Profile" > "API Tokens" > "API Keys" click on "View" button, type your password and resolve the Captcha. Copy the API Key
 		value and use it into APIKey domain settings.
@@ -72,12 +78,12 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 WantedBy=multi-user.target
 
 
-* Enable service on machine start
+**Enable service on machine start**
 systemctl enable CloudFlare
 
-* Start the service
+**Start the service**
 systemctl start CloudFlare
 
-* Check that everything is OK.
+**Check that everything is OK.**
 systemctl status CloudFlare
 
