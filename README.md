@@ -25,14 +25,14 @@ This file contains the main settings
 			subsection with its corresponding values. The domain sections are picked-up automatically, no need for service restart.
 
 
-New domain keys:
-	APIKey - Secret hash value from CloudFlare from your user profile.
-	Email - Email address used in CloudFlare for domain administration.
-	Domain_Name - The top level domain name to work with (Example: mydomain.com)
-	DNS_Record - DNS record to be updated (Example: dyn.mydomain.com or mail.mydomain.com etc. or the top level domain record could work as well Example: mydomain.com).
-	Type - The DNS record type to be updated. Example: A, MX, CNAME etc. (Only A records updates are fully tested!)
-	TTL - Time to live value in seconds. Please, consider that the free CloudFlare accounts are limited to minimum allowed ttl of 120 seconds / 2 min. Do not set values less than that.
-	Proxied - Accepts true or false values and turns the CloudFlare proxy on or off. Please, do not apply to MX records.
+**New domain:**
+* APIKey - Secret hash value from CloudFlare from your user profile.
+* Email - Email address used in CloudFlare for domain administration.
+* Domain_Name - The top level domain name to work with (Example: mydomain.com)
+* DNS_Record - DNS record to be updated (Example: dyn.mydomain.com or mail.mydomain.com etc. or the top level domain record could work as well Example: mydomain.com).
+* Type - The DNS record type to be updated. Example: A, MX, CNAME etc. (Only A records updates are fully tested!)
+* TTL - Time to live value in seconds. Please, consider that the free CloudFlare accounts are limited to minimum allowed ttl of 120 seconds / 2 min. Do not set values less than that.
+* Proxied - Accepts true or false values and turns the CloudFlare proxy on or off. Please, do not apply to MX records.
 
 <br /><br />
 **Log.dat file**
@@ -40,9 +40,13 @@ New domain keys:
 This file contains synchronization events notifications. This file will be automatically maintained to keep its size under 10 MB. After reaching 10 MB size, would be deleted and recreated.
 
 **Event types:**
-Success message per domain in UTC time: "Synced mydomain.com to WAN IP 123.123.123.0 on 12.12.2020 01:05:33 PM"
-Failed WAN IP resolution message: "Could not find the WAN IP address. No syncing will proceed. Please, check Internet connectivity. 12.12.2020 01:05:33 PM"
-Failed with no configuration file found message: "Configuration file not found in this directory: C:\config.dat"
+<br />
+**Success message per domain in UTC time:** "Synced mydomain.com to WAN IP 123.123.123.0 on 12.12.2020 01:05:33 PM"
+
+**Failed WAN IP resolution message:** "Could not find the WAN IP address. No syncing will proceed. Please, check Internet connectivity. 12.12.2020 01:05:33 PM"
+
+**Failed with no configuration file found message:** "Configuration file not found in this directory: C:\config.dat"
+
 General exception messages from try catch blocks.
 
 <br /><br />
