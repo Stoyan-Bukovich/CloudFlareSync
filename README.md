@@ -5,7 +5,6 @@ The code is tested only with A records, theoretically should work with any other
 
 <br /><br />
 Read this before reusing the code:
-
 <br /><br />
 **Rate limiting**
 ****
@@ -57,6 +56,7 @@ To get your APIKey please, logon to your CloudFlare account, go to "My Profile" 
 sudo vi /etc/systemd/system/CloudFlare.service
 
 <br />
+
 > [Unit]
 > Description=CloudFlare Domain Sync
 > 
@@ -76,17 +76,17 @@ sudo vi /etc/systemd/system/CloudFlare.service
 > [Install]
 > WantedBy=multi-user.target
 
-<br /><br />
+<br />
 **Enable service on machine start**
 ****
 systemctl enable CloudFlare
 
-<br /><br />
+<br />
 **Start the service**
 ****
 systemctl start CloudFlare
 
-<br /><br />
+<br />
 **Check that everything is OK.**
 ****
 systemctl status CloudFlare
