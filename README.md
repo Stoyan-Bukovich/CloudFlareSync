@@ -4,18 +4,15 @@ This is a code base for CloudFlare dynamic DNS records update. It permits you to
 The code is tested only with A records, theoretically should work with any other DNS record types.
 
 
+Read this before reusing the code:
 
-**********************
-	Rate limiting
-**********************
 
-The Cloudflare API sets a maximum of 1,200 requests in a five minute period.
+* Rate limiting
+	* The Cloudflare API sets a maximum of 1,200 requests in a five minute period. Please, consider this limitation or you might get banned.
 
-**********************
-	config.dat
-**********************
 
-This file contains the main service settings:
+* Config.dat file
+	* This file contains the main service settings:
 	
 	SyncIntervalInMilliseconds - Would set how frequently all domain names would be synced with CloudFlare. Please, note that all domain names are synced simultaneously.
 							     If this value is changed the change would not be picked-up automatically. Please, restart the service or the executable. Other observation is
