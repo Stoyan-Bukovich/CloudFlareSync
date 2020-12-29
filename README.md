@@ -14,6 +14,11 @@ Read this before reusing the code:
 The Cloudflare API sets a maximum of 1,200 requests in a five minute period. Please, consider this limitation or you might get banned.
 
 <br /><br />
+**Other limitations**
+****
+As reported in CloudFlare forum and blog, free accounts no longer can modify or update via API DNS records belonging to any of the following TLD .tk, gq, .cf, .ga, .ml.
+
+<br /><br />
 **Config.dat file**
 ****
 This file contains the main settings
