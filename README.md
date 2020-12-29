@@ -16,7 +16,7 @@ The Cloudflare API sets a maximum of 1,200 requests in a five minute period. Ple
 <br /><br />
 **Other limitations**
 ****
-As reported in CloudFlare forum and blog, free accounts no longer can modify or update via API DNS records belonging to any of the following TLD .tk, gq, .cf, .ga, .ml.
+As reported in CloudFlare forum and blog, free accounts no longer can modify or update via API DNS records belonging to any of the following TLD .tk, gq, .cf, .ga, .ml. If you want to update any of these and you are on free account, you would need to do it manually from your Dashboard.
 
 <br /><br />
 **Config.dat file**
